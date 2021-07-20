@@ -1,32 +1,83 @@
-ALGORITHM CHECKPOINT
+ALGORITHM first-method
 VAR
-  arr1:ARRAY_OF INTEGER[];
-  arr2:ARRAY_OF INTEGER[];
-  arr3:ARRAY_OF INTEGER[];
-  i:INTEGER;
-  j:INTEGER;
-k:INTEGER;
-k=0;
-  SUM :INTEGER;
+    set1,set2 : ARRAY_OF INTEGER[20];
+    i,j : INTEGER;
+    sum : INTEGER :=  0;
+    found : BOOLEAN;
+BEGIN
+    // reading elements in the two sets
 
-  BEGIN
+    // Compare each element of set one with the second set 
+    // and if element is not present then add that element to sum.
 
-  FOR i FROM 0 TO length(arr1)-1 DO
-  
-  for j from 0 to  length(arr2)-1 DO
-if arr1[i]==arr2[j] then 
-sum+=arr1[i]*2;
-arr3[k]=arr1[i];
-k+=1;
-end if
+    FOR i FROM 0 TO set1.length-1 DO
+        found := FALSE;
+        FOR j FROM 0 TO set2.length-1 DO
+            IF(set1[i] = set2[j]) THEN
+                found := TRUE;
+                BREAK;
+            END
+        END_FOR
+        IF (NOT found) THEN
+            sum := sum + set1[i];
+        END_IF
+    END_FOR
 
-  end for
+    //Then do the vice versa to add elements from the second set. 
+    FOR i FROM 0 TO set2.length-1 DO
+        found := FALSE;
+        FOR j FROM 0 TO set1.length-1 DO
+            IF(set2[i] = set1[j]) THEN
+                found := TRUE;
+                BREAK;
+            END
+        END_FOR
+        IF (NOT found) THEN
+            sum := sum + set2[i];
+        END_IF
+    END_FOR
 
-  END FOR
-
-WRITE (Sum of overlapping elements: sum);
-WRITE  (Explanation: Common elements are:arr3);
-
+    Write(sum);
 END
 
 
+ALGORITHM Second-method
+VAR
+    set1,set2 : ARRAY_OF INTEGER[20];
+    set_keys : ARRAY_OF INTEGER[40];
+    dict := HASH_TABLE<INTEGER,INTEGER>;
+    i, count : INTEGER;
+    sum : INTEGER := 0;
+BEGIN
+    // reading elements in the two sets
+
+    // Insert all the elements from
+    // both the sets with the element as key and its count (in both arrays).
+
+    FOR i FROM 0 TO set1.length -1 STEP 1  DO
+        IF (dict.lookup(set1[i]) = TRUE) THEN
+            count := dict.get(set1[i]);
+            dict.insert(set1[i],count+1);
+        ELSE
+            dict.insert(set1[i],1);
+        END_IF
+    END_FOR
+
+    FOR i FROM 0 TO set2.length -1 STEP 1  DO
+        IF (dict.lookup(set2[i]) = TRUE) THEN
+            count := dict.get(set2[i]);
+            dict.insert(set2[i],count+1);
+        ELSE
+            dict.insert(set2[i],1);
+        END_IF
+    END_FOR
+
+    //get sum of distinct elements
+    set_keys := dict.getKeys();
+    FOR i FROM 0 TO set_keys.length -1 STEP 1  DO
+        IF (dict.get(set_keys[i]) = 1) THEN
+            sum := sum +set_keys[i];
+        END_IF
+    END_FOR
+
+END
